@@ -1,0 +1,8 @@
+browser --> server: GET https://fullstack-exampleapp.herokuapp.com/spa
+server --> browser: Status code 200 OK (spa)
+browser --> server: GET https://fullstack-exampleapp.herokuapp.com/main.css
+server --> browser: Status code 200 OK (main.css)
+browser --> server: GET https://fullstack-exampleapp.herokuapp.com/spa.js
+server --> browser: Status code 200 OK (spa.js)
+browser --> server: GET https://fullstack-exampleapp.herokuapp.com/data.json
+server --> browser: [... { content: "TESTING", date: "2023-07-14T19:22:32.011Z" }]

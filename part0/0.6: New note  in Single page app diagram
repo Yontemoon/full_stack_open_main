@@ -1,0 +1,2 @@
+browser --> server: GET https://fullstack-exampleapp.herokuapp.com/new_note_spa
+server --> browser: Status code 201 
