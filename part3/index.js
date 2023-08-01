@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 app.use(express.json());
 var morgan = require('morgan')
+const cors = require('cors')
 
 const useMorgan = morgan(function (tokens, req, res) {
     return [
@@ -14,7 +15,8 @@ const useMorgan = morgan(function (tokens, req, res) {
 })
 
 app.use(useMorgan)
-
+app.use(cors())
+app.use(express.static('build'))
 let persons = [
     { 
       id: 1,
@@ -51,7 +53,7 @@ app.get('/api/persons', (request, response) => {
     response.json(persons);
 })
 
-const PORT = 3002
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`)
 })
@@ -111,5 +113,6 @@ app.post('/api/persons/', (request, response) => {
 
 
     persons = persons.concat(person)
+    // console.log("IT GOES HERE EVERYTIME")
     response.json(persons)
 })
