@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import serviceBlogs from "../services/blogs";
 
-const Blog = ({blog, username}) => {
-
+const Blog = (props) => {
+  const blog = props.blog
   const [visible, setVisible] = useState(false);
+  const [blogObject, setBlogObject] = useState(blog)
   
   const hideWhenVisible = { display: visible ? "none" : ""};
   const showWhenVisible = { display: visible ? "" : "none"};
@@ -20,16 +20,17 @@ const Blog = ({blog, username}) => {
     marginBottom: 5
   }
 
-  const addLikes = (blog) => {
-    // e.preventDefault();
-    const createBlog = {
-      author: blog.author,
-      title: blog.title,
-      url: blog.url,
-      
+  const addLikes = async (blog) => {
+    const updateBlog = {
+      ...blog,
+      likes: blog.likes+1
     }
-    // serviceBlogs.update()
+    props.handleUpdateBlog(updateBlog)
+    setBlogObject(updateBlog)
   }
+
+
+  const removeBlog = () => props.handleRemoveBlog(blog)
 
   return (
     <div style={blogStyle}>
@@ -43,14 +44,14 @@ const Blog = ({blog, username}) => {
         <div>
           {blog.url}
         </div>
-        {/* <div>
-          {blog.author}
-        </div> */}
         <div>
-          {username}
+          {blog.user.name}
         </div>
         <div>
-          {blog.likes} <button onClick={()=>addLikes(blog)}>Like it!</button>
+          {blogObject.likes} <button onClick={()=>addLikes(blog)}>Like it!</button>
+        </div>
+        <div>
+          <button onClick={removeBlog}>Remove</button>
         </div>
       </div>  
     </div>

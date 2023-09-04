@@ -21,10 +21,21 @@ const create = async (newObject) => {
   return response.then(response => response.data)
 }
 
-const update = (id, newObject) => {
-  const request = axios.put(`${baseUrl}/${id}`, newObject)
+const update = async (id, newObject) => {
+  const config = {
+    headers: { Authorization: token}
+  }
+  const request = axios.put(`${baseUrl}/${id}`, newObject, config)
   return request.then(response => response.data)
 }
 
+const remove = async (id) => {
+  const config = {
+    headers: { Authorization: token}
+  }
+  const request = axios.delete(`${baseUrl}/${id}`,config)
+    return request.then(response => response.data)
+}
+
 // eslint-disable-next-line import/no-anonymous-default-export
-export default { getAll, create , setToken, update }
+export default { getAll, create , setToken, update, remove }

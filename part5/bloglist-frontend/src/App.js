@@ -20,7 +20,6 @@ const App = () => {
   // const [loginVisible, setLoginVisible] = useState(false)
 
   const blogFormRef = useRef();
-  // const userRef = userRef()
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogUser")
@@ -28,6 +27,7 @@ const App = () => {
       const user = JSON.parse(loggedUserJSON);
       setUser(user);
       blogService.setToken(user.token)
+      setShowAll(false)
     }
   },[])
 
@@ -38,57 +38,25 @@ const App = () => {
   })  
   }, [])
 
-  // const loginForm = () => {
-  //   const hideWhenVisible = {display: loginVisible ? "none" : ""};
-  //   const showWhenVisible = {display: loginVisible ? "" : "none"};
+  const addBlog = async (blogObject) => {
 
-  //   return (
-  //     <div>
-  //       <div style={showWhenVisible}>
-  //         <button onClick={() => setLoginVisible(true)}>Log in</button>
-  //       </div>
-  //       <div style={hideWhenVisible}>
-  //         <LoginForm 
-  //           notificationMessage={notificationMessage} 
-  //           handleLogin={handleLogin} 
-  //           username={username} 
-  //           handlePasswordChange={({target}) => setPassword(target.value)} 
-  //           password={password} 
-  //           handleUsernameChange={({target}) => setUsername(target.value)}
-  //         />
-  //         <button onClick={() => setLoginVisible(false)}>Cancel</button>
-  //       </div>
-  //     </div>
-  //   )
-  // }
-
-
-  const addBlog = (blogObject) => {
     blogFormRef.current.toggleVisibility();
-    blogService.create(blogObject).then(returnedBlog => {
-      setBlogs(blogs.concat(returnedBlog))
-      setNotificationMessage(`A new blog: ${blogObject.title} by ${blogObject.author} added.`)
-      setTimeout(() => {
-        setNotificationMessage(null)
-      }, 5000);
-    })
+    const newBlog = await blogService.create(blogObject)
+    setBlogs(blogs.concat(newBlog))
+    setNotificationMessage(`A new blog: ${blogObject.title} by ${blogObject.author} added.`)
+    setTimeout(() => {
+      setNotificationMessage(null)
+    }, 5000);
+    
   }
 
   const blogForm = () => {
     return(
       <Toggleable buttonLabel="New Blog" ref={blogFormRef}>
-        <BlogForm createBlog={addBlog} />
+        <BlogForm createBlog={addBlog}/>
       </Toggleable>
     )
   }
-
-
-
-  // const handleBlogChange = (setterFunction) => (event) => {
-  //   setterFunction(event.target.value)
-  // }
-
-
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -111,42 +79,7 @@ const App = () => {
   }
 
 
-  const blogsToShow = showAll ? blogs : blogs.filter(blog => blog.user.username === user.username)
-
-  // const blogForm = () => {
-  //   return (
-  //     <div>
-  //       <h3>{user.username} has logged in</h3>
-  //       <button onClick={changeLogin}>Logout</button>
-  //       <form onSubmit={addBlog}>
-  //         <div>
-  //           Title:
-  //           <input value={newBlogTitle} onChange={handleBlogChange(setNewBlogTitle)}/>
-  //         </div>
-  //         <div>
-  //           Author:
-  //           <input value={newBlogAuthor} onChange={handleBlogChange(setnewBlogAuthor)}/>
-  //         </div>
-  //         <div>
-  //           URL:
-  //           <input value={newBlogUrl} onChange={handleBlogChange(setnewBlogUrl)}/>
-  //         </div>
-  //         <button type="submit">Create</button>
-  //       </form>
-  //   </div>
-  //   )
-  // }
-
-  // const FilterBlogPosts = () => {
-  //   // console.log(user)
-  //   const filteredBlogs = blogs.filter(blog =>
-  //     blog.user.username === user.username)
-  //     // console.log(filteredBlogs)
-    
-  //   return filteredBlogs.map(blog =>
-  //     <Blog key={blog.id} blog={blog}/>
-  //   )
-  // }
+  const blogsToShow = showAll ? blogs : blogs.filter(blog => blog.user._id === user._id)
 
   const logoutHandler = () => {
     window.localStorage.removeItem("loggedBlogUser");
@@ -154,10 +87,30 @@ const App = () => {
     setShowAll(true)
   }
   
+  const byLikes = (blog1, blog2) => blog2.likes - blog1.likes
 
-  // if (user === null) {
-  //   return loginForm()
-  // }
+  const handleRemoveBlog = async (blogToDelete) => {
+    const confirm = window.confirm(`Are you sure you want to delete ${blogToDelete.user.name}'s ${blogToDelete.title}`)
+    if (confirm) {
+      blogService.remove(blogToDelete.id)
+      setBlogs(blogs.filter(blog => blog.id !== blogToDelete.id))
+      setNotificationMessage(`${blogToDelete.user.name} has removed the blogpost ${blogToDelete.title}`)
+      setTimeout(() => {
+        setNotificationMessage(null)
+      }, 5000)
+    }
+  }
+
+  const handleUpdateBlog = async (blogToUpdate) => {
+    blogService.update(blogToUpdate.id, blogToUpdate)
+    setBlogs(blogs.map(blog => blog.id !== blogToUpdate.id ? blog : blogToUpdate))
+    setNotificationMessage(`${blogToUpdate.user.name} has increased the likes to ${blogToUpdate.likes}`)
+    setTimeout(() => {
+      setNotificationMessage(null)
+    }, 10000)
+  }
+
+
   return (
     <div>
       <h2>Blogs</h2>
@@ -172,26 +125,19 @@ const App = () => {
           handleUsernameChange={({target}) => setUsername(target.value)}/>
         </div>
       }
+
       {user && <div>
         <p>{user.name} is logged in. <button onClick={logoutHandler}>Logout</button></p>
         {blogForm()}
+        {blogsToShow.sort(byLikes).map(blog =>
+          <Blog 
+            key={blog.id} 
+            blog={blog} 
+            handleRemoveBlog={handleRemoveBlog} 
+            handleUpdateBlog={handleUpdateBlog}
+          />
+        )}
       </div>}
-      {/* {FilterBlogPosts()} */}
-      {/* <form onSubmit={addBlog}>
-        <div>
-          Blog Title:
-          <input value={newBlog} onChange={handleBlogChange}/>
-        </div>
-        <button type="submit">Save</button>
-      </form> */}
-
-      {/* {blogsToShow.map(blog =>
-        <Blog key={blog.id} blog={blog} />
-      )} */}
-      {blogsToShow.map(blog =>
-            <Blog key={blog.id} blog={blog} username={user.name}/>
-            )}
-      
     </div>
   )
 }
