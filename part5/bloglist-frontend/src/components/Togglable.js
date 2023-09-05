@@ -30,9 +30,13 @@ const Toggleable = forwardRef((props, refs) => {
         </div>
     )
 })
+Toggleable.displayName = "Toggleable"
 
 Toggleable.propTypes = {
-    buttonLabel: PropTypes.string.isRequired
+    buttonLabel: PropTypes.string.isRequired,
+    children: PropTypes.element.isRequired
 }
+
+
 
 export default Toggleable

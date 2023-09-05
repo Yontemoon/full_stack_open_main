@@ -132,7 +132,8 @@ const App = () => {
         {blogsToShow.sort(byLikes).map(blog =>
           <Blog 
             key={blog.id} 
-            blog={blog} 
+            blog={blog}
+            user={user} 
             handleRemoveBlog={handleRemoveBlog} 
             handleUpdateBlog={handleUpdateBlog}
           />
