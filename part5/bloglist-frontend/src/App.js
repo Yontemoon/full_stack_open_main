@@ -14,35 +14,42 @@ const App = () => {
   const [password, setPassword] = useState("")
   const [notificationMessage, setNotificationMessage] = useState(null)
   const [user, setUser] = useState(null)
-  // const [newBlogTitle, setNewBlogTitle] = useState("")
-  // const [newBlogAuthor, setnewBlogAuthor] = useState("")
-  // const [newBlogUrl, setnewBlogUrl] = useState("")
-  // const [loginVisible, setLoginVisible] = useState(false)
 
   const blogFormRef = useRef();
+
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogUser")
     if(loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
       setUser(user);
+      console.log(user)
       blogService.setToken(user.token)
       setShowAll(false)
+      getAllBlogs()
     }
-  },[])
+    }
+  ,[])
 
-  //NEED TO UPDATE THIS...
-  useEffect(() => {
-    blogService.getAll().then(blogs => {
-      setBlogs(blogs)
-  })  
-  }, [])
+  // NEED TO UPDATE THIS...
+  // useEffect(() => {
+  //   blogService.getAll().then(blogs => {
+  //     setBlogs(blogs)
+  // })  
+  // }, [])
+
+  const getAllBlogs = async () => {
+    const blogs = await blogService.getAll()
+    setBlogs(blogs)
+  } 
 
   const addBlog = async (blogObject) => {
-
     blogFormRef.current.toggleVisibility();
     const newBlog = await blogService.create(blogObject)
+    console.log(newBlog)
     setBlogs(blogs.concat(newBlog))
+    console.log(blogs)
+
     setNotificationMessage(`A new blog: ${blogObject.title} by ${blogObject.author} added.`)
     setTimeout(() => {
       setNotificationMessage(null)
@@ -79,7 +86,7 @@ const App = () => {
   }
 
 
-  const blogsToShow = showAll ? blogs : blogs.filter(blog => blog.user._id === user._id)
+  // const blogsToShow = showAll === true ? blogs : blogs.filter(blog => blog.user.id === user._id)
 
   const logoutHandler = () => {
     window.localStorage.removeItem("loggedBlogUser");
@@ -127,9 +134,9 @@ const App = () => {
       }
 
       {user && <div>
-        <p>{user.name} is logged in. <button onClick={logoutHandler}>Logout</button></p>
+        <p>{user.name} is logged in. username is {user.username}<button onClick={logoutHandler}>Logout</button></p>
         {blogForm()}
-        {blogsToShow.sort(byLikes).map(blog =>
+        {blogs.sort(byLikes).map(blog =>
           <Blog 
             key={blog.id} 
             blog={blog}

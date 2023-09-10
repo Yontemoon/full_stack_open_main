@@ -37,7 +37,7 @@ const Blog = (props) => {
   return (
     <div style={blogStyle} className="blog">
       <div style ={hideWhenVisible} className="visibleBlog">
-        {blog.title} || {blog.author} <button onClick={toggleVisibility}>view</button>
+        {blog.title} || {blog.author} <button onClick={toggleVisibility} className="buttonView">view</button>
       </div>
       <div style={showWhenVisible} className="invisibleBlog">
         <div>
@@ -47,10 +47,10 @@ const Blog = (props) => {
           {blog.url}
         </div>
         <div>
-          {user.name}
+          {blog.user.name}
         </div>
         <div className='likesNumber'>
-          {blogObject.likes} <button onClick={()=>addLikes(blog)}>Like it!</button>
+          {blogObject.likes} <button onClick={()=>addLikes(blog)} className="buttonLike">Like it!</button>
         </div>
         <div>
           <button onClick={removeBlog}>Remove</button>

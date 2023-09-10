@@ -10,13 +10,13 @@ const LoginForm = ({notificationMessage, handleLogin, username, handleUsernameCh
         <form onSubmit={handleLogin}>
           <div>
             Username:
-            <input type="text" value={username} name="Username" onChange={handleUsernameChange}></input>
+            <input type="text" value={username} name="Username" onChange={handleUsernameChange} id="inputUsername"></input>
           </div>
           <div>
             Password:
-            <input type="password" value={password} name="Password" onChange={handlePasswordChange}></input>
+            <input type="password" value={password} name="Password" onChange={handlePasswordChange} id="inputPassword"></input>
           </div>
-          <button type="submit">Submit</button>
+          <button type="submit" id="buttonLogin">Submit</button>
         </form>
       </div>
     );
