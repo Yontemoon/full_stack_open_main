@@ -12,6 +12,16 @@ const getAll = () => {
   return request.then(response => response.data)
 }
 
+// const getUserBlog = async (userId) => {
+//   const response = await axios.get(`${baseUrl}/getUserBlog/${userId}`)
+//   return response.data
+// }
+
+const getSpecificBlog = async (blogId) => {
+  const response = await axios.get(`${baseUrl}/${blogId}`)
+  return response.data
+}
+
 const create = async (newObject) => {
   const config = {
     headers: { Authorization: token }
@@ -22,11 +32,13 @@ const create = async (newObject) => {
 }
 
 const update = async (id, newObject) => {
-  const config = {
-    headers: { Authorization: token}
-  }
-  const request = axios.put(`${baseUrl}/${id}`, newObject, config)
+  const request = axios.put(`${baseUrl}/${id}`, newObject)
   return request.then(response => response.data)
+}
+
+const addNewComment = async (blogId, newComment) => {
+  const response = await axios.put(`${baseUrl}/${blogId}/comments`, newComment)
+  return response.data
 }
 
 const remove = async (id) => {
@@ -38,4 +50,4 @@ const remove = async (id) => {
 }
 
 
-export default { getAll, create , setToken, update, remove }
+export default { getAll, create , setToken, update, remove, getSpecificBlog, addNewComment }

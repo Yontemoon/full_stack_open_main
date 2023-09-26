@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 const Blog = (props) => {
   const blog = props.blog
   const user = props.user
+  console.log(user)
   const [visible, setVisible] = useState(false);
   const [blogObject, setBlogObject] = useState(blog)
   
@@ -47,7 +48,7 @@ const Blog = (props) => {
           {blog.url}
         </div>
         <div>
-          {blog.user.name}
+          {user.name}
         </div>
         <div className='likesNumber'>
           {blogObject.likes} <button onClick={()=>addLikes(blog)} className="buttonLike">Like it!</button>

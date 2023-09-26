@@ -10,6 +10,9 @@ import BlogForm from './components/BlogForm'
 import { useDispatch, useSelector } from 'react-redux'
 import usersService from './services/users'
 import User from './components/User'
+import UserBlogs from './components/UserBlogs'
+import SelectedBlog from './components/SelectedBlog'
+import { BrowserRouter as Router, Routes, Route, Link, useParams } from 'react-router-dom'
 
 
 
@@ -20,6 +23,7 @@ const App = () => {
   const [password, setPassword] = useState("")
   const [user, setUser] = useState(null)
   const [users, setUsers] = useState([])
+  const [getSpecificBlogs, setGetSpecificBlogs] = useState([])
 
   const blogFormRef = useRef();
   const dispatch = useDispatch()
@@ -33,10 +37,12 @@ const App = () => {
       const allUsers = window.localStorage.getItem("allBlogUsers")
       console.log(JSON.parse(allUsers))
       const user = JSON.parse(loggedUserJSON);
+
       setUser(user);
       blogService.setToken(user.token)
       setShowAll(false)
-      getAllBlogs()
+      // getAllBlogs()
+      getUserBlog(user._id)
       setUsers(JSON.parse(allUsers))
     }
     }
@@ -47,6 +53,12 @@ const App = () => {
     const blogs = await blogService.getAll()
     setBlogs(blogs)
   } 
+
+  const getUserBlog = async (userId) => {
+    const blogs = await usersService.getUsersBlogs(userId)
+    console.log(blogs)
+    setBlogs(blogs.blogs)
+  }
 
   const addBlog = async (blogObject) => {
     blogFormRef.current.toggleVisibility();
@@ -90,9 +102,6 @@ const App = () => {
     }
   }
 
-
-  // const blogsToShow = showAll === true ? blogs : blogs.filter(blog => blog.user.id === user._id)
-
   const logoutHandler = () => {
     window.localStorage.removeItem("loggedBlogUser");
     window.localStorage.removeItem("allBlogUsers")
@@ -123,40 +132,78 @@ const App = () => {
       dispatch({type: 'RESET'})
     }, 10000)
   }
-
+  
+  const navigationBar = {
+    padding: 10
+  }
 
   return (
     <div>
+      <Router>
+        {/* NAV BAR */}
+        <div>
+          <Link style={navigationBar} to="/">Your Blogs</Link>
+          <Link style={navigationBar} to="/users">Users</Link>
+          {user ? <em style={navigationBar}>{user.name} is logged in.</em> : <em style={navigationBar}>NO ONE IS LOGGED IN</em>}
+        </div>
       <h2>Blogs</h2>
       {notification}
-      {!user && <div>
-        <LoginForm 
-          handleLogin={handleLogin} 
-          username={username} 
-          handlePasswordChange={({target}) => setPassword(target.value)} 
-          password={password} 
-          handleUsernameChange={({target}) => setUsername(target.value)}/>
-        </div>
-      }
-
-      {user && <div>
-        <p>{user.name} is logged in. username is {user.username}<button onClick={logoutHandler}>Logout</button></p>
-        {blogForm()}
-        {/* {blogs.sort(byLikes).map(blog =>
-          <Blog 
-            key={blog.id} 
-            blog={blog}
-            user={user} 
-            handleRemoveBlog={handleRemoveBlog} 
-            handleUpdateBlog={handleUpdateBlog}
+      
+        <Routes>
+          <Route
+            path="/"
+            element=
+              {!user ?
+                <LoginForm 
+                  handleLogin={handleLogin} 
+                  username={username} 
+                  handlePasswordChange={({target}) => setPassword(target.value)} 
+                  password={password} 
+                  handleUsernameChange={({target}) => setUsername(target.value)}
+                /> :
+                <div>
+                  <p>{user.name} is logged in. username is {user.username}<button onClick={logoutHandler}>Logout</button></p>
+                  {blogForm()}
+                  {blogs.sort(byLikes).map(blog =>
+                    <Blog 
+                      key={blog.id} 
+                      blog={blog}
+                      user={user} 
+                      handleRemoveBlog={handleRemoveBlog} 
+                      handleUpdateBlog={handleUpdateBlog}
+                    />
+                  )}
+                </div>
+              }
+            
           />
-        )} */}
-        <h3>Users</h3>
-        {users.map(user => 
-          <User key={user.id} user={user}/>
-        )}
-      </div>}
+          <Route
+              path="/users"
+              element={
+                <div>
+                  <h3>Users</h3>
+                  {users.map(user =>
+                      <User key={user.id} user={user}/>
+                  )}
+                </div>
+              }
+            />
+          <Route
+            path='/users/:userId'
+            element= {
+              <UserBlogs />
+            }
+          />
+          <Route
+            path="/blogs/:blogId"
+            element = {
+              <SelectedBlog />
+            }
+          />
+        </Routes>
+      </Router>
     </div>
+    
   )
 }
 
